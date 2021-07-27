@@ -8,7 +8,7 @@
     "content_scripts": [
       {
         "matches": ["https://www.google.com/"],
-        "js": ["content_scripts.ts"]
+        "js": ["main.js"]
       }
     ]
   }
