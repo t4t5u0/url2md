@@ -1,11 +1,15 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 
 const execute = async () => {
-    const value = await browser.storage.local.get('date')
-    console.log(value.date || 'no date')
+  //
+  const url = document.URL;
+  const pattern = /(.jpe?g)|(.png)|(.gif)|(.webp)$/;
+  const isImg = pattern.test(url);
+  const title = document.title;
+  // []() | ![]()
+  const mdUrl = `${isImg ? "!" : ""}[${title}](${url})`;
+  await navigator.clipboard.writeText(mdUrl);
+  console.log("copied!");
+};
 
-    await browser.storage.local.set({ date: new Date().toString() })
-    console.log('現在の日時を記録しました')
-}
-
-execute()
+execute();
