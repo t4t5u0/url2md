@@ -1,16 +1,21 @@
 chrome.browserAction.onClicked.addListener((tab: chrome.tabs.Tab) => {
-  alert("before")
+  // alert("before")
+  console.log("before");
   url2md(tab);
-  alert("after")
+  // alert("after")
+  console.log("after");
 });
 
 const url2md = (tab: chrome.tabs.Tab) => {
-  const url = document.URL;
+  const url = tab.url;
   const pattern = /(.jpe?g)|(.png)|(.gif)|(.webp)$/;
   const isImg = pattern.test(url);
-  const title = document.title;
+  const title = tab.title;
   // []() | ![]()
   const mdUrl = `${isImg ? "!" : ""}[${title}](${url})`;
+
+  console.log(mdUrl);
+
   setTimeout(() => {
     navigator.clipboard.writeText(mdUrl);
   }, 500);
