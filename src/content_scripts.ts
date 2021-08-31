@@ -1,6 +1,4 @@
-import browser from "webextension-polyfill";
-
-const url2md = () => {
+const url2md = (tab: chrome.tabs.Tab) => {
   //
   const url = document.URL;
   const pattern = /(.jpe?g)|(.png)|(.gif)|(.webp)$/;
@@ -8,16 +6,19 @@ const url2md = () => {
   const title = document.title;
   // []() | ![]()
   const mdUrl = `${isImg ? "!" : ""}[${title}](${url})`;
+  setTimeout(() => {
+    navigator.clipboard.writeText(mdUrl);
+  }, 500);
   navigator.clipboard.writeText(mdUrl);
   console.log("copied!");
   alert("url2md");
 };
 
-const execute = async () => {
-  // alert("execute");
-  // browser.browserAction.onClicked.addListener(url2md);
-  browser.browserAction.onClicked.addListener(url2md);
-  alert("execute")
-};
+// const execute = async () => {
+chrome.browserAction.onClicked.addListener((tab: chrome.tabs.Tab) => {
+  url2md(tab);
+});
+// alert("execute");
+// };
 
-execute();
+// execute();
