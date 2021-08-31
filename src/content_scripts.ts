@@ -1,7 +1,18 @@
+// chrome.contextMenus.onClicked.addListener(
+//   (_info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) => {
+//     // alert("before")
+//     console.log("before");
+//     url2md(tab).then(() => {
+//       console.log("after");
+//     });
+//   }
+// );
+
 chrome.browserAction.onClicked.addListener((tab: chrome.tabs.Tab) => {
-  // alert("before")
   console.log("before");
-  url2md(tab).then(()=> {console.log("after")});
+  url2md(tab).then(() => {
+    console.log("after");
+  });
 });
 
 const url2md = async (tab: chrome.tabs.Tab) => {
@@ -18,6 +29,11 @@ const url2md = async (tab: chrome.tabs.Tab) => {
   //   await navigator.clipboard.writeText(mdUrl);
   // }, 500);
   // await navigator.clipboard.writeText(mdUrl);
+  // if (navigator.clipboard) {
+  //   navigator.clipboard.writeText(mdUrl);
+  // } else {
+  //   console.log("navigator.clipboard: ", navigator.clipboard);
+  // }
   console.log("copied!");
   alert("url2md");
 };

@@ -5,7 +5,8 @@
 
   "icons": { "32": "icon_32.png" },
   "browser_action": {
-    "default_icon": "icon_32.png"
+    "default_icon": "icon_32.png",
+    "default_popup": "popup.html"
   },
 
   "background": {
@@ -13,5 +14,5 @@
     "persistant": false
   },
 
-  "permissions": ["clipboardWrite", "activeTab"]
+  "permissions": ["clipboardWrite", "activeTab", "contextMenus"]
 }
