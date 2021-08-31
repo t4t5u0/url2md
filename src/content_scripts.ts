@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill";
 
-const execute = async () => {
+const url2md = () => {
   //
   const url = document.URL;
   const pattern = /(.jpe?g)|(.png)|(.gif)|(.webp)$/;
@@ -8,8 +8,16 @@ const execute = async () => {
   const title = document.title;
   // []() | ![]()
   const mdUrl = `${isImg ? "!" : ""}[${title}](${url})`;
-  await navigator.clipboard.writeText(mdUrl);
+  navigator.clipboard.writeText(mdUrl);
   console.log("copied!");
+  alert("url2md");
+};
+
+const execute = async () => {
+  // alert("execute");
+  // browser.browserAction.onClicked.addListener(url2md);
+  browser.browserAction.onClicked.addListener(url2md);
+  alert("execute")
 };
 
 execute();
