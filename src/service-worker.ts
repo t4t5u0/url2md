@@ -3,6 +3,9 @@
  * Markdown のリンク記法でクリップボードへコピーする。
  */
 
+import { loadSettings } from './settings'
+import { cleanUrl } from './url-cleaner'
+
 /** 画像 URL とみなす拡張子 (クエリ・フラグメントは無視する) */
 const IMAGE_PATTERN = /\.(?:jpe?g|png|gif|webp|avif|bmp|svg)(?:[?#].*)?$/i
 
@@ -17,7 +20,8 @@ async function copyTabAsMarkdown(tab: chrome.tabs.Tab): Promise<void> {
   if (id === undefined || !url) return
 
   try {
-    await writeToClipboard(id, toMarkdownLink(title, url))
+    const settings = await loadSettings()
+    await writeToClipboard(id, toMarkdownLink(title, cleanUrl(url, settings)))
     await flashBadge('✓', '#22c55e')
   } catch (error) {
     // chrome:// や Chrome Web Store などスクリプトを注入できないページ

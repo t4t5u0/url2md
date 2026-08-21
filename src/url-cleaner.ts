@@ -1,0 +1,164 @@
+import type { Settings } from './settings'
+
+const AMAZON_HOST = /(?:^|\.)amazon\.[a-z]{2,}(?:\.[a-z]{2})?$/i
+
+/** /dp/B0XXXXXXXX や /gp/product/B0XXXXXXXX から ASIN を取り出す */
+const AMAZON_ASIN =
+  /\/(?:dp|gp\/product|gp\/aw\/d|gp\/offer-listing|exec\/obidos\/ASIN|o\/ASIN)\/([A-Z0-9]{10})(?![A-Z0-9])/
+
+/** Amazon のパス中に紛れ込む /ref=... セグメント */
+const AMAZON_REF_SEGMENT = /^ref=/i
+
+/** どのサイトでも落とすパラメータ (小文字で比較する) */
+const TRACKING_PARAMS: ReadonlySet<string> = new Set([
+  'gclid',
+  'gclsrc',
+  'dclid',
+  'fbclid',
+  'msclkid',
+  'yclid',
+  'twclid',
+  'ttclid',
+  'igshid',
+  'igsh',
+  'epik',
+  'srsltid',
+  '_gl',
+  'mc_cid',
+  'mc_eid',
+  '_hsenc',
+  '_hsmi',
+  'hsctatracking',
+  'icid',
+  'mkt_tok',
+  'oly_anon_id',
+  'oly_enc_id',
+  'vero_conv',
+  'vero_id',
+  'wickedid',
+  '_openstat',
+  'yadcl',
+  'li_fat_id',
+  's_kwcid',
+  'spm',
+  'scm',
+  'trk',
+  'trkcampaign',
+  'ref_src',
+  'ref_url',
+  'referrer',
+  'share_source',
+  'share_medium',
+])
+
+/** 前方一致で落とすパラメータ */
+const TRACKING_PREFIXES: readonly string[] = ['utm_', 'pk_', 'mtm_', 'piwik_', 'matomo_']
+
+/**
+ * 特定のホストでだけ落とすパラメータ。
+ * 末尾が `_` のものは前方一致として扱う。
+ */
+const HOST_TRACKING_PARAMS: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
+  [/(?:^|\.)(?:twitter|x)\.com$/i, ['s', 't', 'ref_src', 'ref_url']],
+  [/(?:^|\.)youtube\.com$/i, ['si', 'feature', 'pp', 'ab_channel']],
+  [/(?:^|\.)youtu\.be$/i, ['si', 'feature']],
+  [
+    AMAZON_HOST,
+    [
+      'tag',
+      'ref',
+      'ref_',
+      'th',
+      'psc',
+      'crid',
+      'sprefix',
+      'qid',
+      'sr',
+      'keywords',
+      'linkcode',
+      'linkid',
+      'creative',
+      'creativeasin',
+      'camp',
+      'ascsubtag',
+      'smid',
+      'content-id',
+      'dib',
+      'dib_tag',
+      'pd_rd_',
+      'pf_rd_',
+      '_encoding',
+    ],
+  ],
+]
+
+/**
+ * `ref` をブランチ名などの構造的な意味で使うホスト。
+ * ここでは `ref` を残す (例: GitLab の ?ref_type=heads と同種の使われ方)。
+ */
+const REF_IS_STRUCTURAL = /(?:^|\.)(?:github\.com|gitlab\.com|bitbucket\.org|codeberg\.org)$/i
+
+/**
+ * 設定に従って URL を整える。
+ * 何も変更しなかった場合は元の文字列をそのまま返す
+ * (URL#toString による意図しない再エンコードを避けるため)。
+ */
+export function cleanUrl(rawUrl: string, settings: Settings): string {
+  let url: URL
+  try {
+    url = new URL(rawUrl)
+  } catch {
+    return rawUrl
+  }
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return rawUrl
+
+  if (settings.amazonShorten && AMAZON_HOST.test(url.hostname)) {
+    const shortened = shortenAmazonUrl(url)
+    if (shortened) return shortened
+  }
+
+  let changed = false
+  if (settings.stripTracking) {
+    changed = stripTrackingParams(url) || changed
+    if (AMAZON_HOST.test(url.hostname)) {
+      changed = stripAmazonRefSegments(url) || changed
+    }
+  }
+
+  return changed ? url.toString() : rawUrl
+}
+
+/** Amazon の商品ページを https://<host>/dp/<ASIN> まで削る */
+function shortenAmazonUrl(url: URL): string | null {
+  const asin = AMAZON_ASIN.exec(url.pathname)?.[1]
+  return asin ? `${url.origin}/dp/${asin}` : null
+}
+
+function stripTrackingParams(url: URL): boolean {
+  const doomed = [...url.searchParams.keys()].filter((key) => isTrackingParam(key, url.hostname))
+  for (const key of doomed) url.searchParams.delete(key)
+  return doomed.length > 0
+}
+
+/** パスに埋め込まれた /ref=xxx を取り除く */
+function stripAmazonRefSegments(url: URL): boolean {
+  const segments = url.pathname.split('/')
+  const kept = segments.filter((segment) => !AMAZON_REF_SEGMENT.test(segment))
+  if (kept.length === segments.length) return false
+  url.pathname = kept.join('/')
+  return true
+}
+
+function isTrackingParam(key: string, hostname: string): boolean {
+  const name = key.toLowerCase()
+
+  if (TRACKING_PREFIXES.some((prefix) => name.startsWith(prefix))) return true
+  if (name === 'ref') return !REF_IS_STRUCTURAL.test(hostname)
+  if (TRACKING_PARAMS.has(name)) return true
+
+  return HOST_TRACKING_PARAMS.some(
+    ([host, keys]) =>
+      host.test(hostname) && keys.some((k) => (k.endsWith('_') ? name.startsWith(k) : name === k)),
+  )
+}

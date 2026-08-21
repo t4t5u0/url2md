@@ -1,6 +1,6 @@
 {
   "name": "url2md",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "現在のタブを Markdown リンク形式でクリップボードにコピーする Chrome 拡張",
   "repository": {
@@ -17,6 +17,8 @@
     "build": "vite build",
     "dev": "vite build --watch --mode development",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "biome check .",
     "format": "biome check --write .",
     "zip": "npm run build && cd dist && zip -qr ../url2md.zip . && cd .."
@@ -25,6 +27,7 @@
     "@biomejs/biome": "^2.3.14",
     "@types/chrome": "^0.1.28",
     "typescript": "^5.9.3",
-    "vite": "^7.1.15"
+    "vite": "^7.1.15",
+    "vitest": "^4.1.11"
   }
 }

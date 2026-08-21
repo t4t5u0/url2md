@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>url2md の設定</title>
+    <style>
+      :root {
+        --brand: #4f46e5;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --bg: #fff;
+        --surface: #f8fafc;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --brand: #818cf8;
+          --ink: #e2e8f0;
+          --muted: #94a3b8;
+          --line: #334155;
+          --bg: #0f172a;
+          --surface: #1e293b;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 22px;
+        min-width: 460px;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Hiragino Sans", "Helvetica Neue", Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      h1 { font-size: 17px; margin: 0 0 4px; }
+      .lead { margin: 0 0 20px; color: var(--muted); font-size: 13px; }
+      .option {
+        display: flex;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+      }
+      .option + .option { margin-top: 10px; }
+      .option input { margin: 3px 0 0; width: 16px; height: 16px; accent-color: var(--brand); flex: none; }
+      .option .name { font-weight: 600; display: block; }
+      .option .desc { color: var(--muted); font-size: 12.5px; }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        background: rgba(127, 127, 127, 0.14);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      .preview { margin-top: 22px; }
+      .preview label { display: block; font-weight: 600; margin-bottom: 6px; }
+      .preview input {
+        width: 100%;
+        padding: 9px 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+      }
+      .preview input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+      .result {
+        margin-top: 10px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        word-break: break-all;
+        min-height: 40px;
+      }
+      .result.same { color: var(--muted); }
+      footer {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      #status { color: #16a34a; opacity: 0; transition: opacity 0.15s; }
+      #status.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <h1>url2md の設定</h1>
+    <p class="lead">変更は自動的に保存され、次回のコピーから反映されます。</p>
+
+    <label class="option">
+      <input type="checkbox" id="amazonShorten" />
+      <span>
+        <span class="name">Amazon の URL を最小化する</span>
+        <span class="desc">
+          商品ページを <code>https://www.amazon.co.jp/dp/ASIN</code> の形まで削ります。
+        </span>
+      </span>
+    </label>
+
+    <label class="option">
+      <input type="checkbox" id="stripTracking" />
+      <span>
+        <span class="name">トラッキング・リファラーパラメータを除去する</span>
+        <span class="desc">
+          <code>utm_*</code> <code>ref</code> <code>fbclid</code> <code>gclid</code>
+          などを取り除きます。GitHub / GitLab のようにブランチ名として
+          <code>ref</code> を使うサイトでは残します。
+        </span>
+      </span>
+    </label>
+
+    <div class="preview">
+      <label for="sample">動作確認</label>
+      <input id="sample" type="url" spellcheck="false" />
+      <div class="result" id="result"></div>
+    </div>
+
+    <footer>
+      <span>url2md</span>
+      <span id="status">保存しました</span>
+    </footer>
+
+    <script type="module" src="/src/options.ts"></script>
+  </body>
+</html>

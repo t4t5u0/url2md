@@ -10,7 +10,10 @@ export default defineConfig({
     target: 'chrome116',
     sourcemap: true,
     rollupOptions: {
-      input: { 'service-worker': 'src/service-worker.ts' },
+      input: {
+        'service-worker': 'src/service-worker.ts',
+        options: 'options.html',
+      },
       output: {
         format: 'es',
         entryFileNames: '[name].js',

@@ -14,6 +14,27 @@
 
 ![url2md の動作](store/screenshot_1280x800.png)
 
+## URL のクリーンアップ
+
+コピーする前に URL を整えます。どちらも**デフォルトで有効**で、拡張機能アイコンを
+右クリック →「オプション」から個別にオフにできます。
+
+| 設定 | 内容 |
+| --- | --- |
+| Amazon の URL を最小化 | 商品ページを `https://www.amazon.co.jp/dp/ASIN` まで削ります（`/ref=...` やアフィリエイトタグ、検索由来のパラメータが消えます） |
+| トラッキング・リファラーパラメータを除去 | `utm_*` `ref` `fbclid` `gclid` `msclkid` などを除去します。X の `?s=20&t=...`、YouTube の `?si=...` といったサイト固有のものにも対応 |
+
+```
+変換前  https://www.amazon.co.jp/Echo-Dot/dp/B09B8VGCR8/ref=cm_sw_r_apan_dp_XYZ?th=1
+変換後  https://www.amazon.co.jp/dp/B09B8VGCR8
+```
+
+誤爆を避けるため、次の場合は URL に手を加えません。
+
+- GitHub / GitLab / Bitbucket / Codeberg の `?ref=` はブランチ名として使われるため残します
+- YouTube の再生位置 `?t=` のように意味のあるパラメータは残します
+- 除去対象が 1 つもなかった URL は、元の文字列をそのまま返します（再エンコードによる変化を防ぐため）
+
 ## インストール
 
 ```sh
@@ -32,6 +53,7 @@ npm run build
 | `npm run dev` | ソースを監視して `dist` を再ビルド (変更後は拡張機能ページで再読み込み) |
 | `npm run build` | 本番ビルド |
 | `npm run typecheck` | 型チェック (`tsc --noEmit`) |
+| `npm test` | Vitest による URL クリーンアップのテスト |
 | `npm run lint` | Biome による lint / format チェック |
 | `npm run format` | Biome で自動修正 |
 
@@ -40,13 +62,16 @@ npm run build
 | パス | 役割 |
 | --- | --- |
 | `src/service-worker.ts` | MV3 の service worker。アイコンのクリックを受けて Markdown を組み立て、`chrome.scripting` でタブにコピー処理を注入する |
+| `src/url-cleaner.ts` | Amazon URL の最小化とトラッキングパラメータ除去のルール（`src/url-cleaner.test.ts` にテスト） |
+| `src/settings.ts` | `chrome.storage.sync` に保存する設定とその既定値 |
+| `options.html` / `src/options.ts` | 設定画面。変換結果をその場で確認できる |
 | `public/manifest.json` | Manifest V3。`public/` 以下はそのまま `dist/` にコピーされる |
 | `vite.config.ts` | Vite のビルド設定 |
 | `assets/` | アイコン・ストア掲載画像の生成元 (SVG / HTML)。ビルドには含まれない |
 | `store/` | Chrome ウェブストア提出用の画像と[掲載情報](store/LISTING.md) |
 
 - 要件: Node.js 20 以上 / Chrome 116 以上
-- 権限は `activeTab` と `scripting` のみ。アイコンをクリックしたタブ以外にはアクセスしません
+- 権限は `activeTab` / `scripting` / `storage` のみ。アイコンをクリックしたタブ以外にはアクセスしません
 
 ## 公開
 

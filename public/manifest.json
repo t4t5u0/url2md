@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "url2md",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "現在のタブを Markdown リンク形式でクリップボードにコピーします",
   "minimum_chrome_version": "116",
   "icons": {
@@ -23,5 +23,9 @@
     "service_worker": "service-worker.js",
     "type": "module"
   },
-  "permissions": ["activeTab", "scripting"]
+  "permissions": ["activeTab", "scripting", "storage"],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  }
 }
