@@ -1,33 +1,30 @@
 {
-  "name": "my-webpack-project",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/t4t5u0/url2md.git",
+  "name": "url2md",
+  "version": "0.2.0",
+  "private": true,
+  "description": "現在のタブを Markdown リンク形式でクリップボードにコピーする Chrome 拡張",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/t4t5u0/url2md.git"
+  },
   "author": "t4t5u0 <ymmtryk0902@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "@types/chrome": "^0.0.154",
-    "webextension-polyfill-ts": "^0.26.0",
-    "webpack": "^5.46.0",
-    "webpack-cli": "^4.7.2"
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch --mode development",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "zip": "npm run build && cd dist && zip -qr ../url2md.zip . && cd .."
   },
   "devDependencies": {
-    "@types/copy-webpack-plugin": "^8.0.1",
-    "@types/webpack": "^5.28.0",
-    "@webpack-cli/generators": "^2.2.0",
-    "copy-webpack-plugin": "^9.0.1",
-    "prettier": "^2.3.2",
-    "ts-loader": "^9.2.4",
-    "ts-node": "^10.1.0",
-    "typescript": "^4.3.5",
-    "webpack-dev-server": "^3.11.2"
-  },
-  "description": "My webpack project",
-  "scripts": {
-    "build": "webpack --mode=production --node-env=production",
-    "build:dev": "webpack --mode=development",
-    "build:prod": "webpack --mode=production --node-env=production",
-    "watch": "webpack --watch",
-    "serve": "webpack serve"
+    "@biomejs/biome": "^2.3.14",
+    "@types/chrome": "^0.1.28",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.15"
   }
 }

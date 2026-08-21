@@ -1,17 +1,21 @@
 {
-  "name": "copy url md style",
-  "manifest_version": 2,
-  "version": "0.1",
+  "manifest_version": 3,
+  "name": "url2md",
+  "version": "0.2.0",
+  "description": "現在のタブを Markdown リンク形式でクリップボードにコピーします",
+  "minimum_chrome_version": "116",
 
   "icons": { "32": "icon_32.png" },
-  "browser_action": {
-    "default_icon": "icon_32.png"
+
+  "action": {
+    "default_icon": { "32": "icon_32.png" },
+    "default_title": "Copy as Markdown link"
   },
 
   "background": {
-    "scripts": ["main.js"],
-    "persistant": false
+    "service_worker": "service-worker.js",
+    "type": "module"
   },
 
-  "permissions": ["clipboardWrite", "activeTab"]
+  "permissions": ["activeTab", "scripting"]
 }
