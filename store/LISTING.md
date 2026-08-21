@@ -47,6 +47,9 @@ url2md は、いま見ているページを Markdown のリンク記法でクリ
 がクリップボードに入ります。あとは README、Issue、Scrapbox、Obsidian、Notion など
 Markdown が使える場所に貼り付けてください。
 
+ページにスクリプトを注入しない作りなので、chrome:// で始まる Chrome の内部ページでも
+そのままコピーできます。
+
 ■ 余計なパラメータを落としてからコピー
 Amazon の商品ページは https://www.amazon.co.jp/dp/ASIN の形まで最小化します。
 utm_source などのトラッキングパラメータ、?ref= のようなリファラーパラメータ、
