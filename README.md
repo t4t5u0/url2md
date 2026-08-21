@@ -10,7 +10,7 @@
 ## できること
 
 ツールバーの拡張機能アイコンをクリックすると、そのタブが Markdown 形式でコピーされます。
-成功するとアイコンに緑のバッジ (✓)、コピーできないページ (`chrome://` や Chrome ウェブストアなど) では赤いバッジ (!) が一瞬表示されます。
+成功するとアイコンに緑のバッジ (✓)、失敗すると赤いバッジ (!) が一瞬表示されます。
 
 ![url2md の動作](store/screenshot_1280x800.png)
 
@@ -61,7 +61,8 @@ npm run build
 
 | パス | 役割 |
 | --- | --- |
-| `src/service-worker.ts` | MV3 の service worker。アイコンのクリックを受けて Markdown を組み立て、`chrome.scripting` でタブにコピー処理を注入する |
+| `src/service-worker.ts` | MV3 の service worker。アイコンのクリックを受けて Markdown を組み立て、offscreen document 経由でコピーする |
+| `offscreen.html` / `src/offscreen.ts` | クリップボード書き込み専用の非表示ページ |
 | `src/url-cleaner.ts` | Amazon URL の最小化とトラッキングパラメータ除去のルール（`src/url-cleaner.test.ts` にテスト） |
 | `src/settings.ts` | `chrome.storage.sync` に保存する設定とその既定値 |
 | `options.html` / `src/options.ts` | 設定画面。変換結果をその場で確認できる |
@@ -71,7 +72,7 @@ npm run build
 | `store/` | Chrome ウェブストア提出用の画像と[掲載情報](store/LISTING.md) |
 
 - 要件: Node.js 20 以上 / Chrome 116 以上
-- 権限は `activeTab` / `scripting` / `storage` のみ。アイコンをクリックしたタブ以外にはアクセスしません
+- 権限は `activeTab` / `storage` / `offscreen` / `clipboardWrite` のみ。アイコンをクリックしたタブ以外にはアクセスしません
 
 ## 公開
 

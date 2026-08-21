@@ -3,6 +3,7 @@
  * Markdown のリンク記法でクリップボードへコピーする。
  */
 
+import type { CopyRequest, CopyResponse } from './messages'
 import { loadSettings } from './settings'
 import { cleanUrl } from './url-cleaner'
 
@@ -10,21 +11,22 @@ import { cleanUrl } from './url-cleaner'
 const IMAGE_PATTERN = /\.(?:jpe?g|png|gif|webp|avif|bmp|svg)(?:[?#].*)?$/i
 
 const BADGE_DURATION_MS = 1_200
+const SEND_RETRY_LIMIT = 10
+const SEND_RETRY_INTERVAL_MS = 50
 
 chrome.action.onClicked.addListener((tab) => {
   void copyTabAsMarkdown(tab)
 })
 
 async function copyTabAsMarkdown(tab: chrome.tabs.Tab): Promise<void> {
-  const { id, url, title } = tab
-  if (id === undefined || !url) return
+  const { url, title } = tab
+  if (!url) return
 
   try {
     const settings = await loadSettings()
-    await writeToClipboard(id, toMarkdownLink(title, cleanUrl(url, settings)))
+    await writeToClipboard(toMarkdownLink(title, cleanUrl(url, settings)))
     await flashBadge('✓', '#22c55e')
   } catch (error) {
-    // chrome:// や Chrome Web Store などスクリプトを注入できないページ
     console.error('url2md: failed to copy', error)
     await flashBadge('!', '#ef4444')
   }
@@ -46,44 +48,75 @@ function escapeUrl(url: string): string {
   return /[\s()<>]/.test(url) ? `<${url.replace(/([<>])/g, '\\$1')}>` : url
 }
 
-async function writeToClipboard(tabId: number, text: string): Promise<void> {
-  const [injection] = await chrome.scripting.executeScript({
-    target: { tabId },
-    func: copyInPage,
-    args: [text],
-  })
+const OFFSCREEN_PATH = 'offscreen.html'
 
-  if (injection?.result !== true) {
-    throw new Error('clipboard write was rejected by the page')
+/**
+ * クリップボードへの書き込みは offscreen document を経由する。
+ * 生成 → 送信 → 破棄が重ならないよう、連打されても直列に実行する。
+ */
+let queue: Promise<unknown> = Promise.resolve()
+
+function writeToClipboard(text: string): Promise<void> {
+  const run = queue.then(
+    () => copyViaOffscreen(text),
+    () => copyViaOffscreen(text),
+  )
+  queue = run.catch(() => undefined)
+  return run
+}
+
+async function copyViaOffscreen(text: string): Promise<void> {
+  await createOffscreenDocument()
+  try {
+    const response = await sendCopyRequest({ target: 'offscreen', type: 'copy', text })
+    if (!response.ok) {
+      throw new Error(response.error ?? 'offscreen document did not copy the text')
+    }
+  } finally {
+    await chrome.offscreen.closeDocument().catch(() => undefined)
   }
 }
 
 /**
- * ページのコンテキストで実行される。service worker には DOM も
- * クリップボードもないため、activeTab 権限でタブ側に注入して書き込む。
- * この関数はシリアライズされて送られるので、外側の変数は参照できない。
+ * createDocument() の解決後もモジュールスクリプトの評価が終わっておらず、
+ * onMessage リスナーが未登録なことがあるため数回リトライする。
  */
-async function copyInPage(text: string): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    // ページが未フォーカス等で Async Clipboard API が使えない場合のフォールバック
-    const textarea = document.createElement('textarea')
-    textarea.value = text
-    textarea.setAttribute('readonly', '')
-    textarea.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none'
-    document.body.append(textarea)
-    textarea.select()
-    const copied = document.execCommand('copy')
-    textarea.remove()
-    return copied
+async function sendCopyRequest(request: CopyRequest): Promise<CopyResponse> {
+  let lastError: unknown = new Error('offscreen document did not respond')
+
+  for (let attempt = 0; attempt < SEND_RETRY_LIMIT; attempt++) {
+    try {
+      const response: CopyResponse | undefined = await chrome.runtime.sendMessage(request)
+      if (response) return response
+    } catch (error) {
+      lastError = error
+    }
+    await delay(SEND_RETRY_INTERVAL_MS)
   }
+
+  throw lastError
+}
+
+async function createOffscreenDocument(): Promise<void> {
+  const contexts = await chrome.runtime.getContexts({
+    contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT],
+  })
+  if (contexts.length > 0) return
+
+  await chrome.offscreen.createDocument({
+    url: OFFSCREEN_PATH,
+    reasons: [chrome.offscreen.Reason.CLIPBOARD],
+    justification: 'Markdown 形式のリンクをクリップボードへ書き込むため',
+  })
 }
 
 async function flashBadge(text: string, color: string): Promise<void> {
   await chrome.action.setBadgeBackgroundColor({ color })
   await chrome.action.setBadgeText({ text })
-  await new Promise((resolve) => setTimeout(resolve, BADGE_DURATION_MS))
+  await delay(BADGE_DURATION_MS)
   await chrome.action.setBadgeText({ text: '' })
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

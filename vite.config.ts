@@ -13,6 +13,7 @@ export default defineConfig({
       input: {
         'service-worker': 'src/service-worker.ts',
         options: 'options.html',
+        offscreen: 'offscreen.html',
       },
       output: {
         format: 'es',
