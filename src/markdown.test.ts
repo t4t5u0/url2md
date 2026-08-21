@@ -29,11 +29,66 @@ describe('タイトルの未読件数', () => {
   })
 })
 
+describe('X / Twitter のタイトル', () => {
+  const post = 'https://x.com/AUTOMATONJapan/status/2090615655657853157'
+
+  it('定型部分と t.co リンクを外して「投稿者: 本文」にする', () => {
+    expect(
+      cleanTitle(
+        'XユーザーのAUTOMATON（オートマトン）さん: 「【ニュース】無法漁師生活 https://t.co/lZsxQEXuZE https://t.co/qaC3s08D6O」 / X',
+        post,
+      ),
+    ).toBe('AUTOMATON（オートマトン）: 【ニュース】無法漁師生活')
+  })
+
+  it('英語 UI の "Name on X" 形式も扱う', () => {
+    expect(cleanTitle('AUTOMATON on X: "hello world https://t.co/abc123" / X', post)).toBe(
+      'AUTOMATON: hello world',
+    )
+  })
+
+  it('旧 Twitter 形式も扱う', () => {
+    expect(cleanTitle('AUTOMATONさんはTwitterを使っています: 「こんにちは」 / Twitter', post)).toBe(
+      'AUTOMATON: こんにちは',
+    )
+  })
+
+  it('本文に「」が含まれていても壊れない', () => {
+    expect(cleanTitle('Xユーザーのfooさん: 「『A』と「B」の話」 / X', post)).toBe(
+      'foo: 『A』と「B」の話',
+    )
+  })
+
+  it('プロフィールページは末尾の / X だけ落とす', () => {
+    expect(
+      cleanTitle('AUTOMATON（オートマトン）(@AUTOMATONJapan) / X', 'https://x.com/AUTOMATONJapan'),
+    ).toBe('AUTOMATON（オートマトン）(@AUTOMATONJapan)')
+  })
+
+  it('未読件数が付いていても処理できる', () => {
+    expect(cleanTitle('(3) Xユーザーのfooさん: 「本文」 / X', post)).toBe('foo: 本文')
+  })
+
+  it('X 以外のサイトのタイトルは触らない', () => {
+    const title = 'Xユーザーのfooさん: 「本文」 / X'
+    expect(cleanTitle(title, 'https://example.com/')).toBe(title)
+  })
+})
+
 describe('Markdown リンクの組み立て', () => {
   it('通常のリンク', () => {
     expect(toMarkdownLink('(3) 通知あり - Example', 'https://example.com/')).toBe(
       '[通知あり - Example](https://example.com/)',
     )
+  })
+
+  it('X の投稿', () => {
+    expect(
+      toMarkdownLink(
+        'Xユーザーのfooさん: 「本文 https://t.co/abc123」 / X',
+        'https://x.com/foo/status/123',
+      ),
+    ).toBe('[foo: 本文](https://x.com/foo/status/123)')
   })
 
   it('画像 URL は ! が付く', () => {

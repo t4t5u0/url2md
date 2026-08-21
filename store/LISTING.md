@@ -57,6 +57,8 @@ X の ?s=20&t=... や YouTube の ?si=... も除去します。
 YouTube では自動生成のミックス (?list=RD...&start_radio=1) だけを落とし、
 自分で作ったプレイリストは残します。
 タイトル先頭に付く未読件数 ((25) など) も取り除きます。
+X / Twitter の投稿は「Xユーザーの〇〇さん: 「…」 / X」の定型部分と t.co の短縮 URL を外して
+「投稿者: 本文」の形に整えます。
 どちらの機能もデフォルトで有効で、オプション画面から個別にオフにできます。
 
     変換前 https://www.amazon.co.jp/Echo-Dot/dp/B09B8VGCR8/ref=cm_sw_r_apan_dp_XYZ?th=1

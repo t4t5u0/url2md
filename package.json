@@ -1,6 +1,6 @@
 {
   "name": "url2md",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "private": true,
   "description": "現在のタブを Markdown リンク形式でクリップボードにコピーする Chrome 拡張",
   "repository": {

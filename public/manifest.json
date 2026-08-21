@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "url2md",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "現在のタブを Markdown リンク形式でクリップボードにコピーします",
   "minimum_chrome_version": "116",
   "icons": {
