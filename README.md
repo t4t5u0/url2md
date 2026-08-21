@@ -42,6 +42,8 @@
 - YouTube のプレイリストは、自動生成のミックス (`list=RD...`) だけを落とし、自分で作ったもの (`list=PL...`) やアルバム (`list=OLAK5uy_...`) は残します
 - 除去対象が 1 つもなかった URL は、元の文字列をそのまま返します（再エンコードによる変化を防ぐため）
 
+除去するパラメータの一覧は [ClearURLs のルール DB](https://github.com/ClearURLs/Rules) を突き合わせて整理しています（`src/url-cleaner.ts`）。ただし ClearURLs が持たない、実際の共有 URL で見かけるもの（TikTok の `is_from_webapp` `sender_device` `web_id` など）は独自に追加しています。逆に `?mc=` `?ie=` のように誤爆しやすい広すぎるパターンは採用していません。
+
 ### タイトルの整形
 
 - 先頭に付く未読件数（YouTube の `(25) `、Gmail の `(1,234) ` など）を取り除きます

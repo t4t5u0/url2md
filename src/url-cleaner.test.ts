@@ -128,6 +128,33 @@ describe('トラッキングパラメータの除去', () => {
     ).toBe('https://www.tiktok.com/@ina_chanda/video/7676041946074500370')
   })
 
+  it('TikTok アプリ共有由来のパラメータも落とす', () => {
+    expect(
+      cleanUrl(
+        'https://www.tiktok.com/t/ZSAbc123/?_r=1&_d=abc&_t=8x&u_code=de1&share_app_name=musically&share_iid=99&user_id=123&source=h5_m&timestamp=1700000000&preview_pb=0',
+        trackingOnly,
+      ),
+    ).toBe('https://www.tiktok.com/t/ZSAbc123/')
+  })
+
+  it('HubSpot / Mailchimp などの配信パラメータを落とす', () => {
+    expect(
+      cleanUrl(
+        'https://example.com/post?__hstc=1&__hssc=2&__hsfp=3&mc_cid=a&mc_tc=b&_ga=GA1.2.3&id=7',
+        trackingOnly,
+      ),
+    ).toBe('https://example.com/post?id=7')
+  })
+
+  it('itm_ / otm_ / hmb_ / ga_ の前方一致も落とす', () => {
+    expect(
+      cleanUrl(
+        'https://example.com/a?itm_campaign=x&otm_source=y&hmb_medium=z&ga_source=w&keep=1',
+        trackingOnly,
+      ),
+    ).toBe('https://example.com/a?keep=1')
+  })
+
   it('フラグメントは保持する', () => {
     expect(cleanUrl('https://example.com/doc?utm_source=x#section-3', trackingOnly)).toBe(
       'https://example.com/doc#section-3',

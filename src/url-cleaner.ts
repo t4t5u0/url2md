@@ -9,8 +9,12 @@ const AMAZON_ASIN =
 /** Amazon のパス中に紛れ込む /ref=... セグメント */
 const AMAZON_REF_SEGMENT = /^ref=/i
 
-/** どのサイトでも落とすパラメータ (小文字で比較する) */
+/**
+ * どのサイトでも落とすパラメータ (小文字で比較する)。
+ * ClearURLs のルール DB (https://github.com/ClearURLs/Rules) を突き合わせて整理した。
+ */
 const TRACKING_PARAMS: ReadonlySet<string> = new Set([
+  // 広告クリック ID
   'gclid',
   'gclsrc',
   'dclid',
@@ -23,27 +27,59 @@ const TRACKING_PARAMS: ReadonlySet<string> = new Set([
   'igsh',
   'epik',
   'srsltid',
+  'rb_clickid',
+  's_kwcid',
+  'li_fat_id',
+  'yadcl',
+  // アクセス解析
+  '_ga',
   '_gl',
+  'gs_l',
+  '_openstat',
+  'os_ehash',
+  'spm',
+  'scm',
+  'trk',
+  'trkcampaign',
+  'icid',
+  'cmpid',
+  's_cid',
+  'tracking_source',
+  'ceneo_spo',
+  'echobox',
+  'wtrid',
+  'wtmc',
+  'wt_mc',
+  'wtzmc',
+  'wt_zmc',
+  '__twitter_impression',
+  // メール配信 / マーケティングオートメーション
   'mc_cid',
   'mc_eid',
+  'mc_tc',
+  'mkt_tok',
+  '__s',
   '_hsenc',
   '_hsmi',
+  '__hsfp',
+  '__hssc',
+  '__hstc',
   'hsctatracking',
-  'icid',
-  'mkt_tok',
+  'ml_subscriber',
+  'ml_subscriber_hash',
   'oly_anon_id',
   'oly_enc_id',
   'vero_conv',
   'vero_id',
   'wickedid',
-  '_openstat',
-  'yadcl',
-  'li_fat_id',
-  's_kwcid',
-  'spm',
-  'scm',
-  'trk',
-  'trkcampaign',
+  // SNS 共有時に付くもの
+  'fb_source',
+  'fb_ref',
+  'fb_action_types',
+  'fb_action_ids',
+  'action_object_map',
+  'action_type_map',
+  'action_ref_map',
   'ref_src',
   'ref_url',
   'referrer',
@@ -52,7 +88,17 @@ const TRACKING_PARAMS: ReadonlySet<string> = new Set([
 ])
 
 /** 前方一致で落とすパラメータ */
-const TRACKING_PREFIXES: readonly string[] = ['utm_', 'pk_', 'mtm_', 'piwik_', 'matomo_']
+const TRACKING_PREFIXES: readonly string[] = [
+  'utm_',
+  'pk_',
+  'mtm_',
+  'piwik_',
+  'matomo_',
+  'ga_',
+  'otm_',
+  'hmb_',
+  'itm_',
+]
 
 /**
  * 特定のホストでだけ落とすパラメータ。
@@ -60,12 +106,16 @@ const TRACKING_PREFIXES: readonly string[] = ['utm_', 'pk_', 'mtm_', 'piwik_', '
  */
 const HOST_TRACKING_PARAMS: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
   [/(?:^|\.)(?:twitter|x)\.com$/i, ['s', 't', 'ref_src', 'ref_url']],
-  [/(?:^|\.)youtube\.com$/i, ['si', 'feature', 'pp', 'ab_channel']],
+  [/(?:^|\.)youtube\.com$/i, ['si', 'feature', 'pp', 'ab_channel', 'kw']],
   [/(?:^|\.)youtu\.be$/i, ['si', 'feature']],
   [
     /(?:^|\.)tiktok\.com$/i,
     [
       'is_from_webapp',
+      '_d',
+      'user_id',
+      'share_app_name',
+      'source',
       'sender_device',
       'web_id',
       '_r',
