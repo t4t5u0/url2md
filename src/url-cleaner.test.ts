@@ -119,6 +119,15 @@ describe('トラッキングパラメータの除去', () => {
     expect(cleanUrl(url, trackingOnly)).toBe(url)
   })
 
+  it('TikTok の is_from_webapp などを落とす', () => {
+    expect(
+      cleanUrl(
+        'https://www.tiktok.com/@ina_chanda/video/7676041946074500370?is_from_webapp=1&sender_device=pc&web_id=7123456789',
+        trackingOnly,
+      ),
+    ).toBe('https://www.tiktok.com/@ina_chanda/video/7676041946074500370')
+  })
+
   it('フラグメントは保持する', () => {
     expect(cleanUrl('https://example.com/doc?utm_source=x#section-3', trackingOnly)).toBe(
       'https://example.com/doc#section-3',

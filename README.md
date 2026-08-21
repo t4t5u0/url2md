@@ -25,7 +25,7 @@
 | 設定 | 内容 |
 | --- | --- |
 | Amazon の URL を最小化 | 商品ページを `https://www.amazon.co.jp/dp/ASIN` まで削ります（`/ref=...` やアフィリエイトタグ、検索由来のパラメータが消えます） |
-| トラッキング・リファラーパラメータを除去 | `utm_*` `ref` `fbclid` `gclid` `msclkid` などを除去します。X の `?s=20&t=...`、YouTube の `?si=...` や自動生成ミックス `?list=RD...&start_radio=1` といったサイト固有のものにも対応 |
+| トラッキング・リファラーパラメータを除去 | `utm_*` `ref` `fbclid` `gclid` `msclkid` などを除去します。X の `?s=20&t=...`、YouTube の `?si=...` や自動生成ミックス `?list=RD...&start_radio=1`、TikTok の `?is_from_webapp=1` といったサイト固有のものにも対応 |
 
 ```
 変換前  https://www.amazon.co.jp/Echo-Dot/dp/B09B8VGCR8/ref=cm_sw_r_apan_dp_XYZ?th=1
