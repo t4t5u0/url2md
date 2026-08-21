@@ -12,7 +12,7 @@
 ツールバーの拡張機能アイコンをクリックすると、そのタブが Markdown 形式でコピーされます。
 成功するとアイコンに緑のバッジ (✓)、コピーできないページ (`chrome://` や Chrome ウェブストアなど) では赤いバッジ (!) が一瞬表示されます。
 
-![スクリーンショット](https://user-images.githubusercontent.com/48282855/131518517-974e4038-f38f-407e-857e-062c9dad41e7.png)
+![url2md の動作](store/screenshot_1280x800.png)
 
 ## インストール
 
@@ -42,9 +42,23 @@ npm run build
 | `src/service-worker.ts` | MV3 の service worker。アイコンのクリックを受けて Markdown を組み立て、`chrome.scripting` でタブにコピー処理を注入する |
 | `public/manifest.json` | Manifest V3。`public/` 以下はそのまま `dist/` にコピーされる |
 | `vite.config.ts` | Vite のビルド設定 |
+| `assets/` | アイコン・ストア掲載画像の生成元 (SVG / HTML)。ビルドには含まれない |
+| `store/` | Chrome ウェブストア提出用の画像と[掲載情報](store/LISTING.md) |
 
 - 要件: Node.js 20 以上 / Chrome 116 以上
 - 権限は `activeTab` と `scripting` のみ。アイコンをクリックしたタブ以外にはアクセスしません
+
+## 公開
+
+Chrome ウェブストアへの提出手順・掲載文面・権限の説明文は [`store/LISTING.md`](store/LISTING.md) にまとめてあります。
+
+```sh
+npm run zip   # -> url2md.zip をアップロード
+```
+
+バージョンを上げるときは `package.json` と `public/manifest.json` の `version` を必ず揃えてください。
+
+プライバシーポリシー: [PRIVACY.md](PRIVACY.md)（データの収集・送信は一切ありません）
 
 ## ライセンス
 

@@ -1,0 +1,59 @@
+<!doctype html><meta charset="utf-8">
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--brand:#4f46e5;--line:#e2e8f0}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;width:1280px;height:800px;overflow:hidden}
+  body{background:linear-gradient(160deg,#eef2ff 0%,#f8fafc 55%,#fff 100%);
+       font-family:"Hiragino Sans","Helvetica Neue",Arial,sans-serif;color:var(--ink);
+       display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px}
+  .brand{display:flex;align-items:center;gap:18px}
+  .brand svg{width:64px;height:64px;border-radius:14px}
+  .brand h1{font-size:52px;margin:0;letter-spacing:-.02em}
+  .brand p{margin:0;font-size:21px;color:var(--muted)}
+  .card{width:880px;background:#fff;border:1px solid var(--line);border-radius:16px;
+        box-shadow:0 18px 50px rgba(15,23,42,.10);overflow:hidden}
+  .bar{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:#f8fafc}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .tab{margin-left:14px;font-size:16px;font-weight:600}
+  .icon-btn{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted)}
+  .icon-btn svg{width:30px;height:30px;border-radius:8px;box-shadow:0 0 0 3px rgba(79,70,229,.22)}
+  .row{padding:20px 26px;font-size:17px;display:flex;gap:14px;align-items:baseline}
+  .row + .row{border-top:1px dashed var(--line)}
+  .key{color:var(--muted);font-size:14px;width:76px;flex:none}
+  .val{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:16px;word-break:break-all}
+  .arrow{font-size:30px;color:var(--brand);line-height:1}
+  .out{width:880px;background:#0f172a;border-radius:16px;padding:26px 30px;
+       box-shadow:0 18px 50px rgba(15,23,42,.22)}
+  .out .lbl{font-size:13px;color:#94a3b8;margin-bottom:12px;letter-spacing:.06em}
+  .out code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:21px;color:#e2e8f0}
+  .out code b{color:#a5b4fc;font-weight:400}
+  .foot{font-size:18px;color:var(--muted)}
+</style>
+<div class="brand">
+  <svg viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="#4f46e5"/><path d="M19,88 V44 h11 l13,17 13,-17 h11 V88 h-11 V60 l-13,17 -13,-17 V88 Z" fill="#fff"/><path d="M88,44 h13 v22 h9 l-15.5,20 -15.5,-20 h9 z" fill="#fff"/></svg>
+  <div><h1>url2md</h1><p>開いているタブを Markdown リンクでコピー</p></div>
+</div>
+
+<div class="card">
+  <div class="bar">
+    <span class="dot" style="background:#f87171"></span>
+    <span class="dot" style="background:#fbbf24"></span>
+    <span class="dot" style="background:#34d399"></span>
+    <span class="tab">Chrome 拡張機能 - Chrome ウェブストア</span>
+    <span class="icon-btn">
+      クリック →
+      <svg viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="#4f46e5"/><path d="M19,88 V44 h11 l13,17 13,-17 h11 V88 h-11 V60 l-13,17 -13,-17 V88 Z" fill="#fff"/><path d="M88,44 h13 v22 h9 l-15.5,20 -15.5,-20 h9 z" fill="#fff"/></svg>
+    </span>
+  </div>
+  <div class="row"><span class="key">タイトル</span><span class="val">Chrome 拡張機能 - Chrome ウェブストア</span></div>
+  <div class="row"><span class="key">URL</span><span class="val">https://chromewebstore.google.com/category/extensions</span></div>
+</div>
+
+<div class="arrow">▼</div>
+
+<div class="out">
+  <div class="lbl">CLIPBOARD</div>
+  <code><b>[</b>Chrome 拡張機能 - Chrome ウェブストア<b>](</b>https://chromewebstore.google.com/category/extensions<b>)</b></code>
+</div>
+
+<p class="foot">画像の URL なら <code style="font-family:ui-monospace,monospace">![...](...)</code> になります</p>
