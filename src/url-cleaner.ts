@@ -92,6 +92,14 @@ const HOST_TRACKING_PARAMS: ReadonlyArray<readonly [RegExp, readonly string[]]> 
   ],
 ]
 
+const YOUTUBE_HOST = /(?:^|\.)(?:youtube\.com|youtu\.be)$/i
+
+/**
+ * YouTube の自動生成ミックス / ラジオ。動画そのものとは無関係なので落とす。
+ * ユーザーが作ったプレイリスト (PL...) やアルバム (OLAK5uy_...) は残す。
+ */
+const YOUTUBE_RADIO_LIST = /^RD/
+
 /**
  * `ref` をブランチ名などの構造的な意味で使うホスト。
  * ここでは `ref` を残す (例: GitLab の ?ref_type=heads と同種の使われ方)。
@@ -136,8 +144,15 @@ function shortenAmazonUrl(url: URL): string | null {
 }
 
 function stripTrackingParams(url: URL): boolean {
-  const doomed = [...url.searchParams.keys()].filter((key) => isTrackingParam(key, url.hostname))
-  for (const key of doomed) url.searchParams.delete(key)
+  const params = url.searchParams
+  const doomed = [...params.keys()].filter((key) =>
+    isTrackingParam(key, url.hostname, params.get(key) ?? ''),
+  )
+
+  // プレイリストを落とすなら、その中の位置を指す index も意味を失う
+  if (doomed.includes('list') && params.has('index')) doomed.push('index')
+
+  for (const key of doomed) params.delete(key)
   return doomed.length > 0
 }
 
@@ -150,8 +165,13 @@ function stripAmazonRefSegments(url: URL): boolean {
   return true
 }
 
-function isTrackingParam(key: string, hostname: string): boolean {
+function isTrackingParam(key: string, hostname: string, value: string): boolean {
   const name = key.toLowerCase()
+
+  if (YOUTUBE_HOST.test(hostname)) {
+    if (name === 'list') return YOUTUBE_RADIO_LIST.test(value)
+    if (name === 'start_radio' || name === 'rv') return true
+  }
 
   if (TRACKING_PREFIXES.some((prefix) => name.startsWith(prefix))) return true
   if (name === 'ref') return !REF_IS_STRUCTURAL.test(hostname)

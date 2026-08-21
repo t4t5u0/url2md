@@ -25,17 +25,24 @@
 | 設定 | 内容 |
 | --- | --- |
 | Amazon の URL を最小化 | 商品ページを `https://www.amazon.co.jp/dp/ASIN` まで削ります（`/ref=...` やアフィリエイトタグ、検索由来のパラメータが消えます） |
-| トラッキング・リファラーパラメータを除去 | `utm_*` `ref` `fbclid` `gclid` `msclkid` などを除去します。X の `?s=20&t=...`、YouTube の `?si=...` といったサイト固有のものにも対応 |
+| トラッキング・リファラーパラメータを除去 | `utm_*` `ref` `fbclid` `gclid` `msclkid` などを除去します。X の `?s=20&t=...`、YouTube の `?si=...` や自動生成ミックス `?list=RD...&start_radio=1` といったサイト固有のものにも対応 |
 
 ```
 変換前  https://www.amazon.co.jp/Echo-Dot/dp/B09B8VGCR8/ref=cm_sw_r_apan_dp_XYZ?th=1
 変換後  https://www.amazon.co.jp/dp/B09B8VGCR8
+
+変換前  https://www.youtube.com/watch?v=uZ1NmQWL6gg&list=RDuZ1NmQWL6gg&start_radio=1
+変換後  https://www.youtube.com/watch?v=uZ1NmQWL6gg
 ```
+
+タイトルの先頭に付く未読件数（YouTube の `(25) `、Gmail の `(1,234) ` など）も取り除きます。
 
 誤爆を避けるため、次の場合は URL に手を加えません。
 
 - GitHub / GitLab / Bitbucket / Codeberg の `?ref=` はブランチ名として使われるため残します
 - YouTube の再生位置 `?t=` のように意味のあるパラメータは残します
+- YouTube のプレイリストは、自動生成のミックス (`list=RD...`) だけを落とし、自分で作ったもの (`list=PL...`) やアルバム (`list=OLAK5uy_...`) は残します
+- `(2026) ` のような 4 桁の数字はタイトルの一部とみなして残します
 - 除去対象が 1 つもなかった URL は、元の文字列をそのまま返します（再エンコードによる変化を防ぐため）
 
 ## インストール
@@ -67,6 +74,7 @@ npm run build
 | `src/service-worker.ts` | MV3 の service worker。アイコンのクリックを受けて Markdown を組み立て、offscreen document 経由でコピーする |
 | `offscreen.html` / `src/offscreen.ts` | クリップボード書き込み専用の非表示ページ |
 | `src/url-cleaner.ts` | Amazon URL の最小化とトラッキングパラメータ除去のルール（`src/url-cleaner.test.ts` にテスト） |
+| `src/markdown.ts` | Markdown リンクの組み立てとタイトルの整形（`src/markdown.test.ts` にテスト） |
 | `src/settings.ts` | `chrome.storage.sync` に保存する設定とその既定値 |
 | `options.html` / `src/options.ts` | 設定画面。変換結果をその場で確認できる |
 | `public/manifest.json` | Manifest V3。`public/` 以下はそのまま `dist/` にコピーされる |

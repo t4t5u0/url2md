@@ -85,6 +85,29 @@ describe('トラッキングパラメータの除去', () => {
     )
   })
 
+  it('YouTube の自動生成ミックス (list=RD...) を落とす', () => {
+    expect(
+      cleanUrl(
+        'https://www.youtube.com/watch?v=uZ1NmQWL6gg&list=RDuZ1NmQWL6gg&start_radio=1',
+        trackingOnly,
+      ),
+    ).toBe('https://www.youtube.com/watch?v=uZ1NmQWL6gg')
+  })
+
+  it('ユーザーのプレイリスト (list=PL...) は残す', () => {
+    const url = 'https://www.youtube.com/watch?v=uZ1NmQWL6gg&list=PLabcdef&index=3'
+    expect(cleanUrl(url, trackingOnly)).toBe(url)
+  })
+
+  it('ミックスを落とすときは index も一緒に落とす', () => {
+    expect(
+      cleanUrl(
+        'https://www.youtube.com/watch?v=uZ1NmQWL6gg&list=RDuZ1NmQWL6gg&index=2',
+        trackingOnly,
+      ),
+    ).toBe('https://www.youtube.com/watch?v=uZ1NmQWL6gg')
+  })
+
   it('YouTube の si は落とすが再生位置 t は残す', () => {
     expect(cleanUrl('https://youtu.be/dQw4w9WgXcQ?si=abc&t=42', trackingOnly)).toBe(
       'https://youtu.be/dQw4w9WgXcQ?t=42',

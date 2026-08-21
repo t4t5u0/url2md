@@ -54,6 +54,9 @@ Markdown が使える場所に貼り付けてください。
 Amazon の商品ページは https://www.amazon.co.jp/dp/ASIN の形まで最小化します。
 utm_source などのトラッキングパラメータ、?ref= のようなリファラーパラメータ、
 X の ?s=20&t=... や YouTube の ?si=... も除去します。
+YouTube では自動生成のミックス (?list=RD...&start_radio=1) だけを落とし、
+自分で作ったプレイリストは残します。
+タイトル先頭に付く未読件数 ((25) など) も取り除きます。
 どちらの機能もデフォルトで有効で、オプション画面から個別にオフにできます。
 
     変換前 https://www.amazon.co.jp/Echo-Dot/dp/B09B8VGCR8/ref=cm_sw_r_apan_dp_XYZ?th=1

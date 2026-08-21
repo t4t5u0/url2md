@@ -3,12 +3,10 @@
  * Markdown のリンク記法でクリップボードへコピーする。
  */
 
+import { toMarkdownLink } from './markdown'
 import type { CopyRequest, CopyResponse } from './messages'
 import { loadSettings } from './settings'
 import { cleanUrl } from './url-cleaner'
-
-/** 画像 URL とみなす拡張子 (クエリ・フラグメントは無視する) */
-const IMAGE_PATTERN = /\.(?:jpe?g|png|gif|webp|avif|bmp|svg)(?:[?#].*)?$/i
 
 const BADGE_DURATION_MS = 1_200
 const SEND_RETRY_LIMIT = 10
@@ -30,22 +28,6 @@ async function copyTabAsMarkdown(tab: chrome.tabs.Tab): Promise<void> {
     console.error('url2md: failed to copy', error)
     await flashBadge('!', '#ef4444')
   }
-}
-
-/** `[title](url)` / 画像なら `![title](url)` を組み立てる */
-function toMarkdownLink(title: string | undefined, url: string): string {
-  const prefix = IMAGE_PATTERN.test(url) ? '!' : ''
-  return `${prefix}[${escapeLinkText(title?.trim() || url)}](${escapeUrl(url)})`
-}
-
-/** リンクテキスト中の記号が記法を壊さないようにエスケープする */
-function escapeLinkText(text: string): string {
-  return text.replace(/([\\[\]])/g, '\\$1')
-}
-
-/** 空白や括弧を含む URL は山括弧で囲む (CommonMark の destination 記法) */
-function escapeUrl(url: string): string {
-  return /[\s()<>]/.test(url) ? `<${url.replace(/([<>])/g, '\\$1')}>` : url
 }
 
 const OFFSCREEN_PATH = 'offscreen.html'
